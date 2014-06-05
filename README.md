@@ -5,4 +5,4 @@ This is a simple Promise library for Apple's Swift language.
 If you try to compile currently (June 5th, 2014), you will get:
 unimplemented IR generation feature non-fixed multi-payload enum layout
 
-Hopefull this gets fixed soon!
+Hopefully this gets fixed soon!
