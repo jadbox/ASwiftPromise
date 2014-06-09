@@ -37,12 +37,16 @@ struct Promise<T,F> {
     
     mutating func onDone(y:T) -> () {
         self.svalue = y;
-        slisteners.map( {x in x(y)} );
+        for f in slisteners {
+            f(y);
+        }
     }
     
     mutating func onFail(y:F) -> () {
         self.fvalue = y;
-        self.flisteners.map( {x in x(y)} );
+        for f in flisteners {
+            f(y);
+        }
     }
     
     mutating func done(listener:FS) {
