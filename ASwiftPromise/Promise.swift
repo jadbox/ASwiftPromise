@@ -5,93 +5,118 @@
 //  Created by @JonathanADunlap on 6/5/14.
 //  Copyright (c) 2014 dunlap. All rights reserved.
 //
+/*
+struct Test<T> {
+    var v:T?;
+    mutating func s( v:(T)->() ) {
+        self.v = v;
+    }
+    mutating func g() -> T? {
+        return v;
+    }
+    init() {}
+}*/
 
-
-enum PromiseState<T,F> {
-    case Unresolved
-    case Fail(F)
-    case Success(T)
-}
-
-class Promise<T,F> {
+struct Promise<T,F> {
     typealias FS = T->();
     typealias FF = F->();
-    var value:PromiseState<T,F> = .Unresolved;
-    var rlisteners:FS[] = []
-    var flisteners:FF[] = []
+    var svalue:T?;
+    var fvalue:F?;
+    var slisteners:FS[] = FS[]()
+    var flisteners:FF[] = FF[]()
+    
     
     init() {
+        
     }
-    init(deferred:Deferred<T,F>) {
-        func onDone(y:T) -> () {
-            value = .Success(y);
-            self.rlisteners.map( {x in x(y)} );
-        }
-        func onFail(y:F) -> () {
-            value = .Fail(y);
-            self.flisteners.map( {x in x(y)} );
-        }
+    
+    mutating func setup(inout deferred:Deferred<T,F>) {
         deferred.done( onDone );
         deferred.fail( onFail );
     }
     
-    func done(listener:FS) {
-        switch value {
-        case .Success(let s):
+    mutating func onDone(y:T) -> () {
+        self.svalue = y;
+        slisteners.map( {x in x(y)} );
+    }
+    
+    mutating func onFail(y:F) -> () {
+        self.fvalue = y;
+        self.flisteners.map( {x in x(y)} );
+    }
+    
+    mutating func done(listener:FS) {
+        if let s = svalue {
             listener(s);
-        default: break;
         }
-        rlisteners += listener;
+        else {
+            slisteners += listener;
+        }
         
     }
-    func fail(listener:FF) {
-        switch value {
-        case .Fail(let f):
+    mutating func fail(listener:FF) {
+        if let f = fvalue {
             listener(f);
-        default: break;
         }
-        flisteners += listener;
+        else { flisteners += listener; }
     }
-    func then(success:FS, fail:FF) {
+    
+    mutating func then(success:FS, fail:FF) {
         self.done(success);
         self.fail(fail);
     }
 }
 
-class Deferred<T,F> : Promise<T,F> {
+struct Deferred<T,F> {
+    typealias FS = (T)->();
+    typealias FF = (F)->();
     typealias D = Deferred<T,F>;
     typealias P = Promise<T,F>;
-    var promises:P[] = []
-    
+    var slistener:FS?
+    var flistener:FF?
+    var svalue:T?;
+    var fvalue:F?;
     
     init() {
-        super.init();
     }
     
     func resolved()->Bool {
-        switch value {
-        case .Unresolved: return false
-        default: return true
-        }
+        return svalue && fvalue
     }
     
-    func resolve(val:T) -> D {
-        if(resolved()) { return self }
-        value = .Success(val)
-        rlisteners.map( {x in x(val)} );
+    mutating func resolve(val:T) -> D {
+        svalue = val;
+        if let s = slistener {
+            s(val);
+        }
         return self
     }
     
-    func reject(val:F) -> D {
-        if(resolved()) { return self }
-        value = .Fail(val)
-        flisteners.map( {x in x(val)} );
+    mutating func reject(val:F) -> D {
+        fvalue = val;
+        if let f = flistener {
+            f(val);
+        }
         return self;
     }
     
-    func promise() -> P {
-        let promise = P(deferred:self);
-        promises += promise;
-        return promise;
+    mutating func done(listener:FS) {
+        if let s = svalue {
+            listener(s);
+        }
+        else { slistener = listener; }
+        
+    }
+    mutating func fail(listener:FF) {
+        if let f = fvalue {
+            listener(f);
+        }
+        else { flistener = listener; }
+    }
+    
+    mutating func getPromise() -> Promise<T,F> {
+        var p = Promise<T,F>()
+        p.setup(&self);
+        return p;
     }
 }
