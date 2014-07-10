@@ -17,7 +17,6 @@ println("----");
 
 var d2 = Deferred<String, String>();
 var promise2 = d2.getPromise();
-promise2.setup(&d2);
 promise2.done({ x in println(x) });
 d2.resolve("Post-resolved Promise");
 
