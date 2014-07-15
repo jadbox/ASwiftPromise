@@ -14,8 +14,8 @@ var p = t.promise;
 
 
 var m = p.success
-    .filter( { $0 < 100 } )
-    .map( { "test" + String($0) } );
+    .filter() { $0 < 100 }
+    .map() { "test" + String($0) };
 
 m.on() { println($0) }
 t.done(98);
