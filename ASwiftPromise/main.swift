@@ -30,5 +30,3 @@ t2.promise.success.merge(m).on() {
 t2.done("hello");
 t.done(1);
 t.done(100); // filtered
-
-

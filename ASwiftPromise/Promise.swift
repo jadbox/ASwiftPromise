@@ -12,14 +12,14 @@ import Foundation
 extension Future {
     func map<K>( f:(T)->K ) -> Future<K> {
         var p = Future<K>()
-        on() { (v:T)->() in p.set( f(v) ); };
+        on() { (v:T)->() in p.val = f(v) };
         return p;
     }
     
     func filter( f:(T)->Bool ) -> Future<T> {
         var p = Future<T>()
         on() {
-            (v:T)->() in if(f(v)) { p.set(v) }
+            (v:T)->() in if(f(v)) { p.val = v }
         };
         return p;
     }
@@ -32,7 +32,7 @@ extension Future {
         func check() {
             if let a = r1 {
                 if let b = r2 {
-                    p.set( (a,b) );
+                    p.val = (a,b);
                 }
             }
         }
@@ -46,17 +46,16 @@ extension Future {
 
 class Future<T> {
     var onSet:[(T)->()] = [];
-    var value:T?;
+    var val:T? = nil {
+        didSet {
+            for s in onSet {
+                s(val!);
+            }
+        }
+    }
     
     func on(f:(T)->()) -> () {
         onSet += f;
-    }
-    
-    func set(t:T) -> () {
-        value = t;
-        for s in onSet {
-            s(t);
-        }
     }
     init() {}
 }
@@ -76,11 +75,11 @@ class Promise<T,F> {
     }
     
     func _onDone(e:T) {
-        success.set(e);
+        success.val = e;
     }
     
     func _onFail(e:F) {
-        fail.set(e);
+        fail.val = e;
     }
     
     init() {
