@@ -1,6 +1,4 @@
-This is a simple Promise library for Apple's Swift language.
-
-It now WORKS as I found a workaround using structs versus classes, since classes cannot have variable size at compilation currently.
+This is a simple (working) Promise library for Apple's Swift language.
 
 Simple pre and post resolve examples:
 
