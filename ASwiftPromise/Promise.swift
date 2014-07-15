@@ -84,7 +84,6 @@ class Promise<T,F> {
     }
     
     init() {
-        //_d = d; d:Deffered<T,F>
     }
 }
 
@@ -94,7 +93,6 @@ class Deffered<T,F> {
     let promise:Promise<T,F> = Promise<T,F>();
     
     init() {
-        //promise = Promise<T,F>(d:self);
     }
     
     func done(t:T) {

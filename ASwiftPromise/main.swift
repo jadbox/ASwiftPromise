@@ -10,7 +10,7 @@ import Foundation
 
 var t = Deffered<Int,Int>();
 var p = t.promise;
-//p.onSuccess( { (x) in println(x) } );
+//p.onSuccess() { (x) in println(x) };
 
 
 var m = p.success
