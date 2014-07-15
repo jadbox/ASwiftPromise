@@ -38,8 +38,8 @@ class Future<T> {
 }
 
 class Promise<T,F> {
-    var success = Future<T>();
-    var fail = Future<F>();
+    let success = Future<T>();
+    let fail = Future<F>();
     
     func onSuccess(f:(T)->()) -> Promise<T,F> {
         success.onSet += f;
@@ -67,7 +67,7 @@ class Promise<T,F> {
 class Deffered<T,F> {
     //var result:T?; Todo caching
     //var error:F?;
-    var promise:Promise<T,F> = Promise<T,F>();
+    let promise:Promise<T,F> = Promise<T,F>();
     
     init() {
         //promise = Promise<T,F>(d:self);
