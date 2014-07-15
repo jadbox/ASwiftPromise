@@ -4,16 +4,27 @@ It now WORKS as I found a workaround using structs versus classes, since classes
 
 Simple pre and post resolve examples:
 
-    var d = Deferred<String, String>();
-    d.resolve("Pre-resolved Promise");
-    var promise = d.getPromise();
-    promise.done({ x in println(x) });
+    var t = Deffered<Int,Int>();
+    var p = t.promise;
+    p.onSuccess() { (x) in println(x) };
 
 
-    var d2 = Deferred<String, String>();
-    var promise2 = d2.getPromise();
-    promise2.setup(&d2);
-    promise2.done({ x in println(x) });
-    d2.resolve("Post-resolved Promise");
+    var m = p.success
+        .filter() { $0 < 100 }
+        .map() { "test" + String($0) };
+
+    m.on() { println($0) }
+    t.done(98);
+    t.done(99);
+    t.done(100); // filtered
+
+    //Merging
+    var t2 = Deffered<String,String>();
+    t2.promise.success.merge(m).on() { // fires when t2 and t are fulfilled
+       println( $0 ); // return value is a Tuple of type <String, Int>
+    }
+    t2.done("hello"); // fulfill promise t2
+    t.done(1); // update promise t
+    t.done(100); // filtered
 
 [@jonathanAdunlap](http://twitter.com/jonathanAdunlap)
