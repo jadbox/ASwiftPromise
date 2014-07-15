@@ -65,8 +65,8 @@ class Promise<T,F> {
 }
 
 class Deffered<T,F> {
-    var result:T?;
-    var error:F?;
+    //var result:T?; Todo caching
+    //var error:F?;
     var promise:Promise<T,F> = Promise<T,F>();
     
     init() {
