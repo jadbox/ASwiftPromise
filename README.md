@@ -1,5 +1,7 @@
 This is a simple (working) Promise library for Apple's Swift language.
 
+Currently, promises do not cache results-- meaning the result handler needs to be added before promise resolves.
+
 Simple pre and post resolve examples:
 
     var t = Deffered<Int,Int>();
