@@ -3,21 +3,25 @@
 //  ASwiftPromise
 //
 //  Created by @JonathanADunlap on 6/4/14.
-//  Copyright (c) 2014 dunlap. All rights reserved.
+//  Copyright (c) 2014 Jonathan Dunlap. All rights reserved.
 //
 
 import Foundation
 
-var d = Deferred<String, String>();
-d.resolve("Pre-resolved Promise");
-var promise = d.getPromise();
-promise.done({ x in println(x) });
+var t = Deffered<Int,Int>();
+var p = t.promise;
+//p.onSuccess( { (x) in println(x) } );
 
-println("----");
 
-var d2 = Deferred<String, String>();
-var promise2 = d2.getPromise();
-promise2.done({ x in println(x) });
-d2.resolve("Post-resolved Promise");
+var m = p.success
+    .filter( { $0 < 100 } )
+    .map( { "test" + String($0) } );
+
+m.onSet += { println($0) }
+t.done(98);
+t.done(99);
+t.done(100);
+
+println("Hello, World!");
 
 
