@@ -12,15 +12,34 @@ import Foundation
 extension Future {
     func map<K>( f:(T)->K ) -> Future<K> {
         var p = Future<K>()
-        onSet += { (v:T)->() in p.set( f(v) ); };
+        on() { (v:T)->() in p.set( f(v) ); };
         return p;
     }
     
     func filter( f:(T)->Bool ) -> Future<T> {
         var p = Future<T>()
-        onSet += {
+        on() {
             (v:T)->() in if(f(v)) { p.set(v) }
         };
+        return p;
+    }
+    
+    func merge<K>( f:Future<K> ) -> Future<(T,K)> {
+        var p = Future<(T,K)>();
+        var r1:T?;
+        var r2:K?;
+        
+        func check() {
+            if let a = r1 {
+                if let b = r2 {
+                    p.set( (a,b) );
+                }
+            }
+        }
+        
+        f.on() { r2 = $0; check() };
+        on() { r1 = $0; check() };
+        
         return p;
     }
 }
@@ -28,6 +47,11 @@ extension Future {
 class Future<T> {
     var onSet:[(T)->()] = [];
     var value:T?;
+    
+    func on(f:(T)->()) -> () {
+        onSet += f;
+    }
+    
     func set(t:T) -> () {
         value = t;
         for s in onSet {

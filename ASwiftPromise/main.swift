@@ -17,11 +17,18 @@ var m = p.success
     .filter( { $0 < 100 } )
     .map( { "test" + String($0) } );
 
-m.onSet += { println($0) }
+m.on() { println($0) }
 t.done(98);
 t.done(99);
 t.done(100);
 
-println("Hello, World!");
+//Merging
+var t2 = Deffered<String,String>();
+t2.promise.success.merge(m).on() {
+    println( $0 );
+}
+t2.done("hello");
+t.done(1);
+t.done(100); // filtered
 
 
