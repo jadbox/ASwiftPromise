@@ -9,40 +9,78 @@
 // Cold Futures store history and replays it to new listeners
 import Foundation
 
-var def1 = Deffered<Int,Int>(isCold: false); //isCold: true for history playback
-var p = def1.promise;
+func simpleHotDeffered() {
+    var def1 = Deffered<Int,Int>(isCold: false);
+    def1.done(3);
+    def1.promise.success.forEach(){
+        if($0==3) {println("fail simpleHotDeffered");}
+        else if($0==5) {println("success simpleHotDeffered");}
+    }
+    def1.done(5);
+}; simpleHotDeffered();
 
-//p.onSuccess() { (x) in println(x) };
-def1.done(2); // Ignored if not cold
+func simpleColdDeffered() {
+    var def1 = Deffered<Int,Int>(isCold: true);
+    def1.done(3);
+    var step = 0;
+    def1.promise.success.forEach(){
+        if($0==3 && step==0) {step++}
+        else if($0==5 && step==1) {println("success simpleColdDeffered");}
+        else {println("failed simpleColdDeffered")}
+    }
+    def1.done(5);
+}; simpleColdDeffered();
 
-var m = p.success
-    .filter() { $0 < 100 }
-    .map() { "My number is " + String($0) }
-    //.forEach() { println($0) }
+func filterMapHotDeffered() {
+    var def1 = Deffered<Int,Int>(isCold: false); //isCold: true for history playback
+    var p = def1.promise;
+    
+    //var step = 0;
+    var m = p.success
+        .filter() { $0 < 100 }
+        .map() { "My number is " + String($0) }
+    
+    m.forEach(){
+        if($0=="My number is 105") {println("fail filterMapHotDeffered");}
+        else if($0=="My number is 5") {println("success filterMapHotDeffered");}
+        else {println("failed filterMapHotDeffered")}
+    }
+    
+    def1.done(105);
+    def1.done(5);
+}; filterMapHotDeffered();
 
+func mergePromise() {
+    var def1 = Deffered<Int,Int>(isCold: false); //isCold: true for history playback
+    
+    //Merging
+    var def2 = Deffered<String,String>();
+    def2.promise.success.merge(def1.promise.success).forEach() {
+        switch $0 {
+        case(let x, let y):
+            if(x=="Hello" && y==5) { println("success mergePromise"); }
+        default:
+            println("fail mergePromise");
+        }
+    }
+    def1.done(5);
+    def2.done("Hello");
+}; mergePromise();
 
-
-//Merging
-var def2 = Deffered<String,String>();
-def2.promise.success.merge(m).forEach() {
-    println( $0 );
-}
-
-//Folding
-var fold = p.success.fold({$0 + $1}, total: 0)
-            .forEach() {
-                println( "Folded to " + String($0) );
-            }
-
-def2.done("hello");
-def1.done(11);
-def1.done(98);
-
-def2.done("world");
-def1.done(99);
-def1.done(100); // filtered
-
-
-
+func foldTest() {
+    var def1 = Deffered<Int,Int>(isCold: false);
+    var step = 0;
+    var f = def1.promise.success.fold({$0 + $1}, total:1)
+        .forEach() {
+            if(step==0 && $0==2) { step++; }
+            else if(step==1 && $0==4) { step++; }
+            else if(step==2 && $0==7) { println("success foldTest") }
+            else { println("fail foldTest") }
+        }
+    
+    def1.done(1);
+    def1.done(2);
+    def1.done(3);
+}; foldTest();
 
 println("completed");
