@@ -1,4 +1,4 @@
-This is a simple (working) Promise library for Apple's Swift language. Since it's becomming more like Rx than a Promise library, I'll be changing the naming convensions soon.
+This is a simple (working) Promise library for Apple's Swift language. Since it's becomming more like Rx than a Promise library, I'll be changing the naming conventions soon.
 
 Futures and Promises can be hot (default) and cold. Cold streams cache their history and replay it to new handlers.
 
