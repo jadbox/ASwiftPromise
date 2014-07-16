@@ -9,24 +9,30 @@
 // Cold Futures store history and replays it to new listeners
 import Foundation
 
-var t = Deffered<Int,Int>(isCold: false); //isCold: true
-var p = t.promise;
+var def1 = Deffered<Int,Int>(isCold: false); //isCold: true
+var p = def1.promise;
 //p.onSuccess() { (x) in println(x) };
+def1.done(2);
 
 var m = p.success
     .filter() { $0 < 100 }
     .map() { "test" + String($0) }
-    .forEach() { println($0) }
+    //.forEach() { println($0) }
 
 
 
 //Merging
-var t2 = Deffered<String,String>();
-t2.promise.success.merge(m).forEach() {
+var def2 = Deffered<String,String>();
+def2.promise.success.merge(m).forEach() {
     println( $0 );
 }
-t2.done("hello");
-t.done(98);
-t.done(99);
-t.done(100); // filtered
+
+def2.done("hello");
+def1.done(11);
+def1.done(98);
+
+def2.done("hello1");
+def1.done(99);
+def1.done(100); // filtered
+
 println("completed");

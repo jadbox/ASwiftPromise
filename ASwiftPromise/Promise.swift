@@ -26,36 +26,28 @@ extension Future {
     
     func merge<K>( f:Future<K> ) -> Future<(T,K)> {
         var p = Future<(T,K)>(isCold:isCold); // Hot
-        /*
-        var r1:T?;
-        var r2:K?;
         
-        func check() {
-            if let a = r1 {
-                if let b = r2 {
-                    p.val = (a,b);
-                }
-            }
-        }
-        
-        f.on() { r2 = $0; check() };
-        on() { r1 = $0; check() };*/
         var fHistoryRead:Bool=false;
         var myHistoryRead:Bool=false;
+        var myCurrent:T?
+        var fCurrent:K?
         on() {
-            if fHistoryRead && f.val { p.val = ($0,f.val!); }
+            myCurrent = $0;
+            if fHistoryRead && fCurrent { p.val = ($0,fCurrent!); }
             else { for b in f.history {
                 p.val = ($0,b);
                 fHistoryRead = true;
-                }}
+                }
+            }
         }
         f.on() {
-            if myHistoryRead && self.val { p.val = (self.val!, $0); }
+            fCurrent = $0;
+            if myHistoryRead && myCurrent { p.val = (myCurrent!, $0); }
             else {
-                    for b in self.history {
-                        p.val = (b, $0);
-                        myHistoryRead = true;
-                    }
+                for b in self.history {
+                    p.val = (b, $0);
+                    myHistoryRead = true;
+                }
             }
         }
 
@@ -94,6 +86,22 @@ class Future<T> { // : Future<T>
     init(isCold:Bool=false) {
         self.isCold = isCold;
     }
+    deinit {
+        
+    }
+    
+   /* func once( t:(T)->() )->Future<T>  {
+       // todo 
+    }*/
+    
+    func removeAllListeners() {
+        _onSet = [];
+    }
+    
+    func removeHistory() {
+        history = [];
+    }
+    
     func on( t:(T)->() )->Future<T>  {
         if isCold {
             for s in history { t(s); } //replay history
