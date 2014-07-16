@@ -31,11 +31,13 @@ func simpleHotDefferedTest() {
 
 func simpleColdDefferedTest() {
     var def1 = Deffered<Int,Int>(isCold: true);
+    def1.done(2); // will be stored for future listeners because it's cold
     def1.done(3);
     var step = 0;
     def1.promise.success.forEach(){
-        if($0==3 && step==0) {step++}
-        else if($0==5 && step==1) {println("success simpleColdDefferedTest");}
+        if($0==2 && step==0) {step++}
+        else if($0==3 && step==1) {step++}
+        else if($0==5 && step==2) {println("success simpleColdDefferedTest");}
         else {println("failed simpleColdDefferedTest")}
     }
     def1.done(5);
