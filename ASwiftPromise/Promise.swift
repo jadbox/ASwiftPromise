@@ -11,13 +11,13 @@ import Foundation
 
 extension Future {
     func map<K>( f:(T)->K ) -> Future<K> {
-        var p = Future<K>()
+        var p = Future<K>(isCold:isCold) // Hot
         on() { (v:T)->() in p.val = f(v) };
         return p;
     }
     
     func filter( f:(T)->Bool ) -> Future<T> {
-        var p = Future<T>()
+        var p = Future<T>(isCold:isCold) // Hot
         on() {
             (v:T)->() in if(f(v)) { p.val = v }
         };
@@ -25,7 +25,8 @@ extension Future {
     }
     
     func merge<K>( f:Future<K> ) -> Future<(T,K)> {
-        var p = Future<(T,K)>();
+        var p = Future<(T,K)>(isCold:isCold); // Hot
+        /*
         var r1:T?;
         var r2:K?;
         
@@ -38,39 +39,111 @@ extension Future {
         }
         
         f.on() { r2 = $0; check() };
-        on() { r1 = $0; check() };
+        on() { r1 = $0; check() };*/
+        var fHistoryRead:Bool=false;
+        var myHistoryRead:Bool=false;
+        on() {
+            if fHistoryRead && f.val { p.val = ($0,f.val!); }
+            else { for b in f.history {
+                p.val = ($0,b);
+                fHistoryRead = true;
+                }}
+        }
+        f.on() {
+            if myHistoryRead && self.val { p.val = (self.val!, $0); }
+            else {
+                    for b in self.history {
+                        p.val = (b, $0);
+                        myHistoryRead = true;
+                    }
+            }
+        }
+
         
         return p;
     }
+    
+    func forEach(f:(T)->()) -> Future<T> {
+        on(f);
+        return self;
+    }
 }
 
+// Using a class instead of a protocol because of compiler limitations
+/*
 class Future<T> {
-    var onSet:[(T)->()] = [];
+    //init() {}
+    var val:T?;
+    func on( t:(T)->() )->Future<T> {
+        return self;
+    }
+    func clone()->Future<T> { return Future<T>(); }
+}*/
+
+class Future<T> { // : Future<T>
+    var _onSet:[(T)->()] = [];
+    var history:[T] = [];
+    var isCold = false;
     var val:T? = nil {
         didSet {
-            for s in onSet {
+            if isCold || history.count == 0 { history += val!; }
+            else { history[0] = val!; }
+            for s in _onSet { s(val!); }
+        }
+    }
+    init(isCold:Bool=false) {
+        self.isCold = isCold;
+    }
+    func on( t:(T)->() )->Future<T>  {
+        if isCold {
+            for s in history { t(s); } //replay history
+        }
+        _onSet += t;
+        return self;
+    }
+    func clone()->Future<T> { return Future<T>(); } // Hot
+    
+}
+/*
+class ColdFuture<T> : Future<T> {
+    //var _onSet:[(T)->()] = [];
+    var past:[T] = [];
+    override var val:T? = nil {
+        didSet {
+            past += val!;
+            for s in _onSet {
                 s(val!);
             }
         }
     }
-    
-    func on(f:(T)->()) -> () {
-        onSet += f;
+    override func on( t:(T)->() )->Future<T> {
+        for s in past {
+            t(s);
+        }
+        _onSet += t;
+        return self;
     }
-    init() {}
-}
+    override func clone()->Future<T> {
+        var p = ColdFuture<T>();
+        //p.past = past;
+        return p;
+    }
+    init() {
+        //super.init();
+    }
+}*/
 
 class Promise<T,F> {
-    let success = Future<T>();
-    let fail = Future<F>();
+    let success:Future<T>;
+    let fail:Future<F>;
     
     func onSuccess(f:(T)->()) -> Promise<T,F> {
-        success.onSet += f;
+        success.on(f);
         return self;
     }
     
     func onFail(f:(F)->()) -> Promise<T,F> {
-        fail.onSet += f;
+        fail.on(f);
         return self;
     }
     
@@ -82,16 +155,22 @@ class Promise<T,F> {
         fail.val = e;
     }
     
-    init() {
+    init(isCold:Bool=false) {
+        if isCold==false {
+            success = Future<T>(); // Hot
+            fail = Future<F>();
+        } else {
+            success = Future<T>(isCold:true);
+            fail = Future<F>(isCold:true);
+        }
     }
 }
 
 class Deffered<T,F> {
-    //var result:T?; Todo caching
-    //var error:F?;
-    let promise:Promise<T,F> = Promise<T,F>();
+    let promise:Promise<T,F>;
     
-    init() {
+    init(isCold:Bool=false) {
+        promise = Promise<T,F>(isCold:isCold);
     }
     
     func done(t:T) {
