@@ -27,28 +27,24 @@ extension Future {
     func merge<K>( f:Future<K> ) -> Future<(T,K)> {
         var p = Future<(T,K)>(isCold:isCold); // Hot
         
-        var fHistoryRead:Bool=false;
-        var myHistoryRead:Bool=false;
         var myCurrent:T?
         var fCurrent:K?
         on() {
-            myCurrent = $0;
-            if fHistoryRead && fCurrent { p.val = ($0,fCurrent!); }
+            if myCurrent && fCurrent { p.val = ($0,fCurrent!); }
             else { for b in f.history {
                 p.val = ($0,b);
-                fHistoryRead = true;
                 }
             }
+            myCurrent = $0;
         }
         f.on() {
-            fCurrent = $0;
-            if myHistoryRead && myCurrent { p.val = (myCurrent!, $0); }
+            if fCurrent && myCurrent { p.val = (myCurrent!, $0); }
             else {
                 for b in self.history {
                     p.val = (b, $0);
-                    myHistoryRead = true;
                 }
             }
+            fCurrent = $0;
         }
 
         
@@ -60,17 +56,6 @@ extension Future {
         return self;
     }
 }
-
-// Using a class instead of a protocol because of compiler limitations
-/*
-class Future<T> {
-    //init() {}
-    var val:T?;
-    func on( t:(T)->() )->Future<T> {
-        return self;
-    }
-    func clone()->Future<T> { return Future<T>(); }
-}*/
 
 class Future<T> { // : Future<T>
     var _onSet:[(T)->()] = [];

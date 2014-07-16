@@ -9,14 +9,15 @@
 // Cold Futures store history and replays it to new listeners
 import Foundation
 
-var def1 = Deffered<Int,Int>(isCold: false); //isCold: true
+var def1 = Deffered<Int,Int>(isCold: true); //isCold: true
 var p = def1.promise;
+
 //p.onSuccess() { (x) in println(x) };
 def1.done(2);
 
 var m = p.success
     .filter() { $0 < 100 }
-    .map() { "test" + String($0) }
+    .map() { "My number is " + String($0) }
     //.forEach() { println($0) }
 
 
