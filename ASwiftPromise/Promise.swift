@@ -115,34 +115,6 @@ class Future<T> { // : Future<T>
     func clone()->Future<T> { return Future<T>(); } // Hot
     
 }
-/*
-class ColdFuture<T> : Future<T> {
-    //var _onSet:[(T)->()] = [];
-    var past:[T] = [];
-    override var val:T? = nil {
-        didSet {
-            past += val!;
-            for s in _onSet {
-                s(val!);
-            }
-        }
-    }
-    override func on( t:(T)->() )->Future<T> {
-        for s in past {
-            t(s);
-        }
-        _onSet += t;
-        return self;
-    }
-    override func clone()->Future<T> {
-        var p = ColdFuture<T>();
-        //p.past = past;
-        return p;
-    }
-    init() {
-        //super.init();
-    }
-}*/
 
 class Promise<T,F> {
     let success:Future<T>;
