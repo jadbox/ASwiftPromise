@@ -20,7 +20,7 @@ Examples:
 
     //Merging
     var d2 = Deffered<String,String>();
-    d2.promise.success.merge(mf).on() { // fires when t2 and t are fulfilled
+    d2.promise.success.merge(mf).on() { // fires when both streams are fulfilled
        println( $0 ); // return value is a Tuple of type <String, Int>
     }
     d2.done("hello"); // fulfill promise in d2
