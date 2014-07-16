@@ -1,12 +1,14 @@
 This is a simple (working) Promise library for Apple's Swift language.
 
-Currently, promises do not cache results-- meaning the result handler needs to be added before promise resolves.
+Futures and Promises can be hot (default) and cold. Cold streams cache their history and replay it to new handlers.
 
-Simple pre and post resolve examples:
+Examples:
 
-    var d = Deffered<Int,Int>();
+    var d = Deffered<Int,Int>(isCold:false);
     var p = d.promise;
-
+    
+    d.done(2); // ignored since the Deffered is cold and no handles have been placed on the promise yet
+    
     var mf = p.success
         .filter() { $0 < 100 }
         .map() { "Hello World " + String($0) }
