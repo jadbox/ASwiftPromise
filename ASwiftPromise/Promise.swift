@@ -10,12 +10,30 @@
 import Foundation
 
 extension Future {
+    /*
+    func print() -> () {
+        forEach() {
+            println( String( $0 ) );
+        }
+    }*/
+    // Map elements from the stream
     func map<K>( f:(T)->K ) -> Future<K> {
         var p = Future<K>(isCold:isCold) // Hot
         on() { (v:T)->() in p.val = f(v) };
         return p;
     }
     
+    // Reduce the stream
+    func fold<K>( f:(T, K)->K, var total:K ) -> Future<K> {
+        var p = Future<K>(isCold:isCold) // Hot
+        on() {
+            total = f($0, total);
+            p.val = total;
+        }
+        return p;
+    }
+    
+    // Filter elements from the stream
     func filter( f:(T)->Bool ) -> Future<T> {
         var p = Future<T>(isCold:isCold) // Hot
         on() {
@@ -24,6 +42,7 @@ extension Future {
         return p;
     }
     
+    // Merge two streams together
     func merge<K>( f:Future<K> ) -> Future<(T,K)> {
         var p = Future<(T,K)>(isCold:isCold); // Hot
         
@@ -46,7 +65,6 @@ extension Future {
             }
             fCurrent = $0;
         }
-
         
         return p;
     }
