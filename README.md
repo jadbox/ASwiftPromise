@@ -27,6 +27,6 @@ Examples:
     d.done(1); // update promise t
     d.done(100); // filtered because of the filter on mf
     
-** See [main.swift](https://github.com/jadbox/ASwiftPromise/blob/master/ASwiftPromise/main.swift) for more examples! **
+**See [main.swift](https://github.com/jadbox/ASwiftPromise/blob/master/ASwiftPromise/main.swift) for more examples!**
 
 [@jonathanAdunlap](http://twitter.com/jonathanAdunlap)
