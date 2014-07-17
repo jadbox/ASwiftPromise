@@ -8,7 +8,7 @@ Supported operations: filter, map, forEach, fold, merge, slideBy, once
 
 Simple Example (using shorthands):
 
-    var o = Observable<String>(isCold:false);
+    var o = Observable<String>();
     o >= { // same as o.forEach{
         println("Hello \($0)");
     }
