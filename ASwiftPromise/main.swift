@@ -12,17 +12,28 @@ import Foundation
 func simpleFuture() {
     var f = Future<Int>(isCold: false);
     f.val = 3; // thrown away since it's hot
-    f.forEach(){
+    f.forEach() {
         if($0==3) {println("fail simpleFuture");}
         else if($0==5) {println("success simpleFuture");}
     }
     f.val = 5;
 }; simpleFuture();
 
+//Test if the once method happens for just first stream element
+func onceTest() {
+    var f = Future<Int>(isCold: false);
+    f.once() {
+        if($0==1) {println("success of first call to onceTest");}
+        else { println("fail onceTest, recieved another "+String($0)); }
+    }
+    f.val = 1;
+    f.val = 5;
+}; onceTest();
+
 func simpleHotDefferedTest() {
     var def1 = Deffered<Int,Int>(isCold: false);
     def1.done(3); // thrown away since it's hot
-    def1.promise.success.forEach(){
+    def1.promise.success.forEach() {
         if($0==3) {println("fail simpleHotDefferedTest");}
         else if($0==5) {println("success simpleHotDefferedTest");}
     }

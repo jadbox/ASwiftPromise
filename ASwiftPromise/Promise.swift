@@ -75,15 +75,74 @@ extension Future {
     }
 }
 
+class FNode<T> { // function node
+    typealias F = (T)->();
+    var f:F;
+    var once:Bool = false
+    var next:FNode<T>?;
+    var prev:FNode<T>?;
+    var isHead:Bool=false; // workaround for compiler head comparison bug
+    init(cb:F, once:Bool=false) { self.f = cb; self.once = once; }
+}
+class FLL<T> { // function link list
+    typealias F = (T)->();
+    var head:FNode<T>?;
+    func forEachCall(t:T) {
+        var current = head;
+        do {
+            if let node = current {
+                node.f(t);
+                current = node.next;
+                if(node.once) { removeNode(node); }
+            } else {
+                break;
+            }
+        } while(true);
+    }
+    func removeNode(n:FNode<T>) {
+        if let p = n.prev {
+            p.next = n.next; // it's fine that n has no next node (option type);
+        }
+        n.next = nil; n.prev = nil;
+        // compiler bug http://stackoverflow.com/questions/24668210/swift-using-if-on-an-enum-resulting-in-error-not-convertible-to-arraycastkind
+        if(n.isHead) { head = nil; }
+    }
+    func add(f:F, once:Bool=false) {
+        var c = head;
+        head = FNode(cb:f, once:once);
+        head!.isHead = true;
+        head!.next = c;
+        if c { c!.prev = head; c!.isHead = false; }
+    }
+    func removeAll()->() {
+        var current = head;
+        do {
+            if let node = current {
+                node.prev = nil; // break circles
+                current = node.next;
+            } else {
+                break;
+            }
+        } while(true);
+        
+        head=nil; // chop the head
+    }
+    init() {}
+}
+@assignment func +=<T> (inout left: FLL<T>, right: (T)->()) {
+    left.add(right);
+}
+
+
 class Future<T> { // : Future<T>
-    var _onSet:[(T)->()] = [];
+    var _onSet:FLL<T> = FLL<T>();
     var history:[T] = [];
     var isCold = false;
     var val:T? = nil {
         didSet {
             if isCold || history.count == 0 { history += val!; }
             else { history[0] = val!; }
-            for s in _onSet { s(val!); }
+            _onSet.forEachCall(val!);
         }
     }
     init(isCold:Bool=false) {
@@ -92,13 +151,14 @@ class Future<T> { // : Future<T>
     deinit {
         
     }
-    
-   /* func once( t:(T)->() )->Future<T>  {
-       // todo 
-    }*/
+    // Call the handler only once
+    func once( t:(T)->() )->Future<T>  {
+        _onSet.add(t, once:true);
+        return self;
+    }
     
     func removeAllListeners() {
-        _onSet = [];
+        _onSet.removeAll();
     }
     
     func removeHistory() {
@@ -112,7 +172,7 @@ class Future<T> { // : Future<T>
         _onSet += t;
         return self;
     }
-    func clone()->Future<T> { return Future<T>(); } // Hot
+    func clone()->Future<T> { return Future<T>(isCold: isCold); }
     
 }
 
