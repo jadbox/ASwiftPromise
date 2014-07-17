@@ -7,7 +7,7 @@ Examples:
     // A Promise contains two Observables to monitor sent data and raised errors
     var p = Promise<Int,Int>(isCold:false);
     
-    p.send(2); // ignored since the Deffered is hot and no handles have been placed on the promise yet
+    p.send(2); // ignored since it is hot and no handles have been placed on the promise yet
     
     var mf = p.success
         .filter() { $0 < 100 } // filter items less than 100 from the stream
@@ -15,7 +15,7 @@ Examples:
         .forEach() { (x) in println(x) }; // forEach does not change the stream output
 
     p.send(98);
-    p <= 99; // shorthand for d.send(99)
+    p <= 99; // shorthand for send(99)
     p <= 105; // filtered since 105 is not < 100
 
     //Merging
