@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		2EC3C19F1940F98800554A1F /* Promise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EC3C19E1940F98800554A1F /* Promise.swift */; };
 		2EEB441F193FF2A200D64F33 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EEB441E193FF2A200D64F33 /* main.swift */; };
+		CCA4031A19788638008875BB /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = CCA4031919788638008875BB /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,6 +28,7 @@
 		2EC3C19E1940F98800554A1F /* Promise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Promise.swift; sourceTree = "<group>"; };
 		2EEB441B193FF2A200D64F33 /* ASwiftPromise */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ASwiftPromise; sourceTree = BUILT_PRODUCTS_DIR; };
 		2EEB441E193FF2A200D64F33 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		CCA4031919788638008875BB /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +61,7 @@
 		2EEB441D193FF2A200D64F33 /* ASwiftPromise */ = {
 			isa = PBXGroup;
 			children = (
+				CCA4031919788638008875BB /* README.md */,
 				2EEB441E193FF2A200D64F33 /* main.swift */,
 				2EC3C19E1940F98800554A1F /* Promise.swift */,
 			);
@@ -121,6 +124,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CCA4031A19788638008875BB /* README.md in Sources */,
 				2EEB441F193FF2A200D64F33 /* main.swift in Sources */,
 				2EC3C19F1940F98800554A1F /* Promise.swift in Sources */,
 			);

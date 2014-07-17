@@ -13,7 +13,7 @@ operator prefix >= {} // shortcut for forEach
 operator prefix >>= {} // shortcut for map
 operator prefix %= {} // shortcut for filter
 
-extension Future {
+extension Observable {
     /*
     func print() -> () {
         forEach() {
@@ -21,15 +21,15 @@ extension Future {
         }
     }*/
     // Map elements from the stream
-    func map<K>( f:(T)->K ) -> Future<K> {
-        var p = Future<K>(isCold:isCold) // Hot
+    func map<K>( f:(T)->K ) -> Observable<K> {
+        var p = Observable<K>(isCold:isCold) // Hot
         on() { (v:T)->() in p.val = f(v) };
         return p;
     }
     
     // Reduce the stream
-    func fold<K>( f:(T, K)->K, var total:K ) -> Future<K> {
-        var p = Future<K>(isCold:isCold) // Hot
+    func fold<K>( f:(T, K)->K, var total:K ) -> Observable<K> {
+        var p = Observable<K>(isCold:isCold) // Hot
         on() {
             total = f($0, total);
             p.val = total;
@@ -38,8 +38,8 @@ extension Future {
     }
     
     // Filter elements from the stream
-    func filter( f:(T)->Bool ) -> Future<T> {
-        var p = Future<T>(isCold:isCold) // Hot
+    func filter( f:(T)->Bool ) -> Observable<T> {
+        var p = Observable<T>(isCold:isCold) // Hot
         on() {
             (v:T)->() in if(f(v)) { p.val = v }
         };
@@ -47,8 +47,8 @@ extension Future {
     }
     
     // Merge two streams together
-    func merge<K>( f:Future<K> ) -> Future<(T,K)> {
-        var p = Future<(T,K)>(isCold:isCold);
+    func merge<K>( f:Observable<K> ) -> Observable<(T,K)> {
+        var p = Observable<(T,K)>(isCold:isCold);
         
         var myCurrent:T?
         var fCurrent:K?
@@ -73,15 +73,15 @@ extension Future {
         return p;
     }
     
-    func forEach(f:(T)->()) -> Future<T> {
+    func forEach(f:(T)->()) -> Observable<T> {
         on(f);
         return self;
     }
     
     // Produce a future with an array of values that slide from the last N values
     // Slides are always hot
-    func slideBy( n:Int ) -> Future<[T]> {
-        var fu = Future<[T]>(isCold:isCold);
+    func slideBy( n:Int ) -> Observable<[T]> {
+        var fu = Observable<[T]>(isCold:isCold);
         var list:[T] = [];
         on() {
             list += $0;
@@ -154,7 +154,7 @@ class FLL<T> { // function link list
     left.add(right);
 }
 
-class Future<T> { // : Future<T>
+class Observable<T> { // : Future<T>
     var _onSet:FLL<T> = FLL<T>();
     var history:[T] = [];
     var isCold = false;
@@ -172,7 +172,7 @@ class Future<T> { // : Future<T>
         
     }
     // Call the handler only once
-    func once( t:(T)->() )->Future<T>  {
+    func once( t:(T)->() )->Observable<T>  {
         _onSet.add(t, once:true);
         return self;
     }
@@ -185,35 +185,39 @@ class Future<T> { // : Future<T>
         history = [];
     }
     
-    func on( t:(T)->() )->Future<T>  {
+    func on( t:(T)->() )->Observable<T>  {
         if isCold {
             for s in history { t(s); } //replay history
         }
         _onSet += t;
         return self;
     }
-    func clone()->Future<T> { return Future<T>(isCold: isCold); }
+    func clone()->Observable<T> { return Observable<T>(isCold: isCold); }
     
 }
 
-@assignment func <=<T> (inout left: Future<T>, right: T) {
+@assignment func <=<T> (inout left: Observable<T>, right: T) {
     left.val = right;
 }
-@infix @assignment func >=<T> (inout left: Future<T>, right: (T)->()) -> Future<T> {
+@infix @assignment func >=<T> (inout left: Observable<T>, right: (T)->()) -> Observable<T> {
     left.forEach(right);
     return left;
 }
-@infix func >>=<T,K> (left: Future<T>, right: (T)->(K)) -> Future<K> {
+@infix func >>=<T,K> (left: Observable<T>, right: (T)->(K)) -> Observable<K> {
     return left.map(right);
 }
-@infix func %=<T> (left: Future<T>, right: (T)->(Bool)) -> Future<T> {
+@infix func %=<T> (left: Observable<T>, right: (T)->(Bool)) -> Observable<T> {
     return left.filter(right);
 }
 
-// Promises encapsolate two Futures for success and fail
+// Promises encapsolate two Observables for success and fail
 class Promise<T,F> {
-    let success:Future<T>;
-    let fail:Future<F>;
+    let success:Observable<T>;
+    let fail:Observable<F>;
+    
+    func subscribe(data:(T)->(), err:(F)->()) {
+        onSuccess(data).onFail(err);
+    }
     
     func onSuccess(f:(T)->()) -> Promise<T,F> {
         success.on(f);
@@ -225,52 +229,31 @@ class Promise<T,F> {
         return self;
     }
     
-    func _onDone(e:T) {
+    func send(e:T) {
         success.val = e;
     }
     
-    func _onFail(e:F) {
+    func fail(e:F) {
         fail.val = e;
     }
     
     init(isCold:Bool=false) {
-        if isCold==false {
-            success = Future<T>(); // Hot
-            fail = Future<F>();
-        } else {
-            success = Future<T>(isCold:true);
-            fail = Future<F>(isCold:true);
-        }
+        success = Observable<T>(isCold:isCold);
+        fail = Observable<F>(isCold:isCold);
     }
 }
+
 // Shorthand for success handlers on the promise
-@infix func >=<T,F> (left: Promise<T,F>, right: (T)->()) -> Future<T> {
+@infix func >=<T,F> (left: Promise<T,F>, right: (T)->()) -> Observable<T> {
     left.success.forEach(right);
     return left.success;
 }
-@infix func >>=<T,F,K> (left: Promise<T,F>, right: (T)->(K)) -> Future<K> {
+@infix func >>=<T,F,K> (left: Promise<T,F>, right: (T)->(K)) -> Observable<K> {
     return left.success >>= right;
 }
-@infix func %=<T,F> (left: Promise<T,F>, right: (T)->(Bool)) -> Future<T> {
+@infix func %=<T,F> (left: Promise<T,F>, right: (T)->(Bool)) -> Observable<T> {
     return left.success %= right;
 }
-
-// Deffered fulfills its Promise, instructing a success or fail
-class Deffered<T,F> {
-    let promise:Promise<T,F>;
-    
-    init(isCold:Bool=false) {
-        promise = Promise<T,F>(isCold:isCold);
-    }
-    
-    func send(t:T) {
-        promise._onDone(t);
-    }
-    
-    func fail(t:F) {
-        promise._onFail(t);
-    }
-}
-@assignment func <=<T,F> (inout left: Deffered<T,F>, right: T) {
-    left.send(right);
+@infix func <=<T,F> (left: Promise<T,F>, right: T) {
+    left.success.val = right;
 }
