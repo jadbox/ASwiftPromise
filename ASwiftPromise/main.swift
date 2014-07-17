@@ -155,12 +155,13 @@ func coldSlidingTest() {
 func promiseFailTest() {
     var f = Promise<Int, String>(isCold: true);
     f.onData() {
-        println($0);
+        println("failed promiseFailTest with \($0)");
     }
     f.onFail() {
-        println($0);
+        if($0 == "Testing failure") { println("success promiseFailTest"); }
+        else { println("failed promiseFailTest with incorrect fail: \($0)") }
     }
     f.fail("Testing failure");
-}
+}; promiseFailTest();
 
 println("completed");

@@ -11,6 +11,13 @@ Examples:
     // A Promise contains two Observables to monitor sent data and raised errors
     var p = Promise<Int,String>(isCold:false); // Data will be Ints and errors will be Strings
     
+    // === Error case ===
+    p.onFail { // same as p.errrors.forEach
+        println("Failed with \($0)")
+    }
+    p.fail("Testing Failure"); // triggers above fail handler (of type String)
+    
+    // === Handling Data === 
     p.send(2); // ignored since it is hot and no handles have been placed on the promise yet
     
     var mf = p.success

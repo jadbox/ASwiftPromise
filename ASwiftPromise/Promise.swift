@@ -213,7 +213,7 @@ class Observable<T> { // : Future<T>
 // Promises encapsolate two Observables for success and fail
 class Promise<T,F> {
     let success:Observable<T>;
-    let fail:Observable<F>;
+    let errors:Observable<F>;
     
     func subscribe(data:(T)->(), err:(F)->()) {
         onData(data).onFail(err);
@@ -225,7 +225,7 @@ class Promise<T,F> {
     }
     
     func onFail(f:(F)->()) -> Promise<T,F> {
-        fail.on(f);
+        errors.on(f);
         return self;
     }
     
@@ -234,12 +234,12 @@ class Promise<T,F> {
     }
     
     func fail(e:F) {
-        fail.val = e;
+        errors.val = e;
     }
     
     init(isCold:Bool=false) {
         success = Observable<T>(isCold:isCold);
-        fail = Observable<F>(isCold:isCold);
+        errors = Observable<F>(isCold:isCold);
     }
 }
 
