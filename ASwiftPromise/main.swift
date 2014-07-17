@@ -67,7 +67,7 @@ func filterMapHotTest() {
     m.forEach(){
         if($0=="My number is 105") {println("fail filterMapHotDeffered");}
         else if($0=="My number is 5") {println("success filterMapHotDeffered");}
-        else {println("failed filterMapHotDeffered")}
+        else {println("failed filterMapHotDeffered unexpected")}
     }
     
     def1.done(105);
@@ -84,7 +84,7 @@ func mergeTest() {
         case(let x, let y):
             if(x=="Hello" && y==5) { println("success mergeTest"); }
         default:
-            println("fail mergeTest");
+            println("failed mergeTest");
         }
     }
     def1.done(5);
@@ -99,7 +99,7 @@ func foldTest() {
             if(step==0 && $0==1+2) { step++; }
             else if(step==1 && $0==1+2+3) { step++; }
             else if(step==2 && $0==1+2+3+4) { println("success foldTest") }
-            else { println("fail foldTest") }
+            else { println("failed foldTest unexpected") }
         }
     
     def1.done(2);
@@ -113,12 +113,28 @@ func slidingTest() {
     var step = 0;
     f.slideBy(3).forEach {
         if(step==0 && $0 == [1,5,10]) { step++; }
-        if(step==1 && $0 == [5,10,15]) { println("success slidingTest") }
+        else if(step==1 && $0 == [5,10,15]) { println("success slidingTest") }
+        else { println("failed slidingTest unexpected with \($0)" ) }
     }
     f.val = 1;
     f.val = 5;
     f.val = 10;
     f.val = 15;
 }; slidingTest();
+
+func coldSlidingTest() {
+    var f = Future<Int>(isCold: true);
+    f.val = 1;
+    f.val = 5;
+    f.val = 10;
+    f.val = 15;
+    // Method is called once and then is removed
+    var step = 0;
+    f.slideBy(3).forEach {
+        if(step==0 && $0 == [1,5,10]) { step++; }
+        else if(step==1 && $0 == [5,10,15]) { println("success coldSlidingTest") }
+        else { println("failed coldSlidingTest unexpected with \($0)" ) }
+    }
+}; coldSlidingTest();
 
 println("completed");

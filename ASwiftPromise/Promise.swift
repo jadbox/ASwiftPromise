@@ -44,7 +44,7 @@ extension Future {
     
     // Merge two streams together
     func merge<K>( f:Future<K> ) -> Future<(T,K)> {
-        var p = Future<(T,K)>(isCold:isCold); // Hot
+        var p = Future<(T,K)>(isCold:isCold);
         
         var myCurrent:T?
         var fCurrent:K?
@@ -77,7 +77,7 @@ extension Future {
     // Produce a future with an array of values that slide from the last N values
     // Slides are always hot
     func slideBy( n:Int ) -> Future<[T]> {
-        var fu = Future<[T]>();
+        var fu = Future<[T]>(isCold:isCold);
         var list:[T] = [];
         on() {
             list += $0;
