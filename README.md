@@ -41,8 +41,11 @@ Examples:
 **See [main.swift](https://github.com/jadbox/ASwiftPromise/blob/master/ASwiftPromise/main.swift) for more examples!**
 
 forEach shorthand >=
+
 Mapping shorthand >>=
+
 Filter shorthand %=
+
 Send (input) data shorthand <=
 
 [@jonathanAdunlap](http://twitter.com/jonathanAdunlap)
