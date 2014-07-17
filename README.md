@@ -9,7 +9,7 @@ Supported operations: filter, map, forEach, fold, merge, slideBy, once
 Examples:
 
     // A Promise contains two Observables to monitor sent data and raised errors
-    var p = Promise<Int,Int>(isCold:false);
+    var p = Promise<Int,String>(isCold:false); // Data will be Ints and errors will be Strings
     
     p.send(2); // ignored since it is hot and no handles have been placed on the promise yet
     
