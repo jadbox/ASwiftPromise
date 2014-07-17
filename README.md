@@ -13,7 +13,7 @@ Examples:
     
     var mf = p.success
         .filter { $0 < 100 } // filter items less than 100 from the stream
-        .map { "World " + String($0) } // change the stream from ints to strings
+        .map { "World \($0)" } // change the stream from ints to strings
         .forEach { (x) in println(x) }; // forEach does not change the stream output
 
     p.send(98);

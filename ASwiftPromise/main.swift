@@ -60,7 +60,7 @@ func filterMapHotTest() {
     
     var m = def1.success
         .filter { $0 < 100 }
-        .map { "My number is " + String($0) }
+        .map { "My number is \($0)" }
     
     m.forEach {
         if($0=="My number is 105") {println("fail filterMapHotDeffered");}
