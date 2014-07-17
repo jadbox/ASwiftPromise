@@ -22,6 +22,7 @@ func simpleFuture() {
 //Test if the once method happens for just first stream element
 func onceTest() {
     var f = Future<Int>(isCold: false);
+    // Method is called once and then is removed
     f.once() {
         if($0==1) {println("success of first call to onceTest");}
         else { println("fail onceTest, recieved another "+String($0)); }
@@ -105,5 +106,19 @@ func foldTest() {
     def1.done(3);
     def1.done(4);
 }; foldTest();
+
+func slidingTest() {
+    var f = Future<Int>(isCold: false);
+    // Method is called once and then is removed
+    var step = 0;
+    f.slideBy(3).forEach {
+        if(step==0 && $0 == [1,5,10]) { step++; }
+        if(step==1 && $0 == [5,10,15]) { println("success slidingTest") }
+    }
+    f.val = 1;
+    f.val = 5;
+    f.val = 10;
+    f.val = 15;
+}; slidingTest();
 
 println("completed");

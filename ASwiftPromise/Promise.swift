@@ -73,6 +73,22 @@ extension Future {
         on(f);
         return self;
     }
+    
+    // produce an array of values that slide from the last N values
+    func slideBy( n:Int ) -> Future<[T]> {
+        var fu = Future<[T]>();
+        var list:[T] = [];
+        on() {
+            list += $0;
+            if(list.count >= n) {
+                let start = list.count - n;
+                let end = list.count;
+                list = Array(list[start..<end]);
+                fu.val = list;
+            }
+        }
+        return fu;
+    }
 }
 
 class FNode<T> { // function node
