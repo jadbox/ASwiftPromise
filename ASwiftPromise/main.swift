@@ -59,10 +59,10 @@ func filterMapHotTest() {
     var def1 = Promise<Int,Int>(isCold: false); //isCold: true for history playback
     
     var m = def1.success
-        .filter() { $0 < 100 }
-        .map() { "My number is " + String($0) }
+        .filter { $0 < 100 }
+        .map { "My number is " + String($0) }
     
-    m.forEach(){
+    m.forEach {
         if($0=="My number is 105") {println("fail filterMapHotDeffered");}
         else if($0=="My number is 5") {println("success filterMapHotDeffered");}
         else {println("failed filterMapHotDeffered unexpected")}
@@ -110,7 +110,7 @@ func foldTest() {
     var def1 = Promise<Int,Int>(isCold: false);
     var step = 0;
     var f = def1.success.fold({$0 + $1}, total:1)
-        .forEach() {
+        .forEach {
             if(step==0 && $0==1+2) { step++; }
             else if(step==1 && $0==1+2+3) { step++; }
             else if(step==2 && $0==1+2+3+4) { println("success foldTest") }

@@ -12,9 +12,9 @@ Examples:
     p.send(2); // ignored since it is hot and no handles have been placed on the promise yet
     
     var mf = p.success
-        .filter() { $0 < 100 } // filter items less than 100 from the stream
-        .map() { "World " + String($0) } // change the stream from ints to strings
-        .forEach() { (x) in println(x) }; // forEach does not change the stream output
+        .filter { $0 < 100 } // filter items less than 100 from the stream
+        .map { "World " + String($0) } // change the stream from ints to strings
+        .forEach { (x) in println(x) }; // forEach does not change the stream output
 
     p.send(98);
     p <= 99; // shorthand for send(99)
@@ -22,7 +22,7 @@ Examples:
 
     //Merging
     var p2 = Promise<String,String>();
-    p2.success.merge(mf).on() { // fires when both streams are fulfilled
+    p2.success.merge(mf).forEach { // fires when both streams are fulfilled
        println( $0 ); // prints ("Hello", "World 1") of type Tuple<String, String>
     }
     p2 <= "Hello"; // fulfill promise in d2
