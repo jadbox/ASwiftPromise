@@ -124,7 +124,7 @@ func foldTest() {
 
 func slidingTest() {
     var f = Observable<Int>(isCold: false);
-    // Method is called once and then is removed
+    
     var step = 0;
     f.slideBy(3).forEach {
         if(step==0 && $0 == [1,5,10]) { step++; }
@@ -143,7 +143,7 @@ func coldSlidingTest() {
     f.val = 5;
     f.val = 10;
     f.val = 15;
-    // Method is called once and then is removed
+    
     var step = 0;
     f.slideBy(3).forEach {
         if(step==0 && $0 == [1,5,10]) { step++; }
@@ -151,5 +151,16 @@ func coldSlidingTest() {
         else { println("failed coldSlidingTest unexpected with \($0)" ) }
     }
 }; coldSlidingTest();
+
+func promiseFailTest() {
+    var f = Promise<Int, String>(isCold: true);
+    f.onData() {
+        println($0);
+    }
+    f.onFail() {
+        println($0);
+    }
+    f.fail("Testing failure");
+}
 
 println("completed");
