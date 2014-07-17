@@ -6,7 +6,7 @@ Observables and Promises can be hot (default) and cold. Cold streams cache their
 
 Supported operations: filter, map, forEach, fold, merge, slideBy, once
 
-Simple Example (using shorthands):
+Simple setup (using shorthands):
 
     var o = Observable<String>();
     o >= { // same as o.forEach{
@@ -46,7 +46,7 @@ Examples:
     p <= 1; // update promise p
     p <= 100; // filtered because of the filter on mf
     
-**See [main.swift](https://github.com/jadbox/ASwiftPromise/blob/master/ASwiftPromise/main.swift) for more examples!**
+**See [main.swift](https://github.com/jadbox/ASwiftPromise/blob/master/ASwiftPromise/main.swift) for several more detailed examples!**
 
 forEach shorthand >=
 
