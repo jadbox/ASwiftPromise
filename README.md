@@ -6,6 +6,14 @@ Observables and Promises can be hot (default) and cold. Cold streams cache their
 
 Supported operations: filter, map, forEach, fold, merge, slideBy, once
 
+Simple Example (using shorthands):
+
+    var o = Observable<String>(isCold:false);
+    o >= { // same as o.forEach{
+        println("Hello \($0)");
+    }
+    o <= "World"; // same as o.send("World")
+
 Examples:
 
     // A Promise contains two Observables to monitor sent data and raised errors
