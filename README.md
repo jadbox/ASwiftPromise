@@ -1,30 +1,32 @@
-This is a simple (working) Promise library for Apple's Swift language.
+This is a simple (working) Promise library for Apple's Swift language. Since it's becomming more like Rx than a Promise library, I'll be changing the naming conventions soon.
 
-Currently, promises do not cache results-- meaning the result handler needs to be added before promise resolves.
+Futures and Promises can be hot (default) and cold. Cold streams cache their history and replay it to new handlers.
 
-Simple pre and post resolve examples:
+Examples:
 
-    var t = Deffered<Int,Int>();
-    var p = t.promise;
-    p.onSuccess() { (x) in println(x) };
-
-
-    var m = p.success
+    var d = Deffered<Int,Int>(isCold:false);
+    var p = d.promise;
+    
+    d.done(2); // ignored since the Deffered is hot and no handles have been placed on the promise yet
+    
+    var mf = p.success
         .filter() { $0 < 100 }
-        .map() { "test" + String($0) };
+        .map() { "Hello World " + String($0) } // change the stream from ints to strings
+        .forEach() { (x) in println(x) }; // forEach does not change the stream output
 
-    m.on() { println($0) }
-    t.done(98);
-    t.done(99);
-    t.done(100); // filtered
+    d.done(98);
+    d.done(99);
+    d.done(100); // filtered
 
     //Merging
-    var t2 = Deffered<String,String>();
-    t2.promise.success.merge(m).on() { // fires when t2 and t are fulfilled
-       println( $0 ); // return value is a Tuple of type <String, Int>
+    var d2 = Deffered<String,String>();
+    d2.promise.success.merge(mf).on() { // fires when both streams are fulfilled
+       println( $0 ); // return value is a Tuple of type <String, String>
     }
-    t2.done("hello"); // fulfill promise t2
-    t.done(1); // update promise t
-    t.done(100); // filtered
+    d2.done("hello"); // fulfill promise in d2
+    d.done(1); // update promise p
+    d.done(100); // filtered because of the filter on mf
+    
+**See [main.swift](https://github.com/jadbox/ASwiftPromise/blob/master/ASwiftPromise/main.swift) for more examples!**
 
 [@jonathanAdunlap](http://twitter.com/jonathanAdunlap)
