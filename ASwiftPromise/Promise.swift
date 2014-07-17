@@ -74,7 +74,8 @@ extension Future {
         return self;
     }
     
-    // produce an array of values that slide from the last N values
+    // Produce a future with an array of values that slide from the last N values
+    // Slides are always hot
     func slideBy( n:Int ) -> Future<[T]> {
         var fu = Future<[T]>();
         var list:[T] = [];
