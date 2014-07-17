@@ -216,10 +216,10 @@ class Promise<T,F> {
     let fail:Observable<F>;
     
     func subscribe(data:(T)->(), err:(F)->()) {
-        onSuccess(data).onFail(err);
+        onData(data).onFail(err);
     }
     
-    func onSuccess(f:(T)->()) -> Promise<T,F> {
+    func onData(f:(T)->()) -> Promise<T,F> {
         success.on(f);
         return self;
     }
