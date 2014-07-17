@@ -12,7 +12,7 @@ Examples:
     var mf = p.success
         .filter() { $0 < 100 }
         .map() { "Hello World " + String($0) }
-        .forEach() { (x) in println(x) };
+        .forEach() { (x) in println(x) }; // forEach does not change the stream output
 
     d.done(98);
     d.done(99);
