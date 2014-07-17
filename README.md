@@ -3,6 +3,7 @@ This is a simple (working) Promise library for Apple's Swift language. Since it'
 Futures and Promises can be hot (default) and cold. Cold streams cache their history and replay it to new handlers.
 
 Examples:
+
     // A Promise contains two Observables to monitor sent data and raised errors
     var p = Promise<Int,Int>(isCold:false);
     
