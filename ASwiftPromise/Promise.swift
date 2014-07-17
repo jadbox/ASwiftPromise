@@ -8,6 +8,10 @@
 //
 //typealias FS = T->();
 import Foundation
+operator prefix <= {} // shortcut for assignments
+operator prefix >= {} // shortcut for forEach
+operator prefix >>= {} // shortcut for map
+operator prefix %= {} // shortcut for filter
 
 extension Future {
     /*
@@ -150,7 +154,6 @@ class FLL<T> { // function link list
     left.add(right);
 }
 
-
 class Future<T> { // : Future<T>
     var _onSet:FLL<T> = FLL<T>();
     var history:[T] = [];
@@ -193,6 +196,20 @@ class Future<T> { // : Future<T>
     
 }
 
+@assignment func <=<T> (inout left: Future<T>, right: T) {
+    left.val = right;
+}
+@infix @assignment func >=<T> (inout left: Future<T>, right: (T)->()) -> Future<T> {
+    left.forEach(right);
+    return left;
+}
+@infix func >>=<T,K> (left: Future<T>, right: (T)->(K)) -> Future<K> {
+    return left.map(right);
+}
+@infix func %=<T> (left: Future<T>, right: (T)->(Bool)) -> Future<T> {
+    return left.filter(right);
+}
+
 // Promises encapsolate two Futures for success and fail
 class Promise<T,F> {
     let success:Future<T>;
@@ -226,6 +243,17 @@ class Promise<T,F> {
         }
     }
 }
+// Shorthand for success handlers on the promise
+@infix func >=<T,F> (left: Promise<T,F>, right: (T)->()) -> Future<T> {
+    left.success.forEach(right);
+    return left.success;
+}
+@infix func >>=<T,F,K> (left: Promise<T,F>, right: (T)->(K)) -> Future<K> {
+    return left.success >>= right;
+}
+@infix func %=<T,F> (left: Promise<T,F>, right: (T)->(Bool)) -> Future<T> {
+    return left.success %= right;
+}
 
 // Deffered fulfills its Promise, instructing a success or fail
 class Deffered<T,F> {
@@ -235,11 +263,14 @@ class Deffered<T,F> {
         promise = Promise<T,F>(isCold:isCold);
     }
     
-    func done(t:T) {
+    func send(t:T) {
         promise._onDone(t);
     }
     
     func fail(t:F) {
         promise._onFail(t);
     }
+}
+@assignment func <=<T,F> (inout left: Deffered<T,F>, right: T) {
+    left.send(right);
 }

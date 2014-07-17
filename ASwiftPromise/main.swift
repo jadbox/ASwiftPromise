@@ -16,7 +16,7 @@ func simpleFuture() {
         if($0==3) {println("fail simpleFuture");}
         else if($0==5) {println("success simpleFuture");}
     }
-    f.val = 5;
+    f <= 5; // shorthand for f.val = 5
 }; simpleFuture();
 
 //Test if the once method happens for just first stream element
@@ -33,18 +33,18 @@ func onceTest() {
 
 func simpleHotDefferedTest() {
     var def1 = Deffered<Int,Int>(isCold: false);
-    def1.done(3); // thrown away since it's hot
+    def1.send(3); // thrown away since it's hot
     def1.promise.success.forEach() {
         if($0==3) {println("fail simpleHotDefferedTest");}
         else if($0==5) {println("success simpleHotDefferedTest");}
     }
-    def1.done(5);
+    def1.send(5);
 }; simpleHotDefferedTest();
 
 func simpleColdDefferedTest() {
     var def1 = Deffered<Int,Int>(isCold: true);
-    def1.done(2); // will be stored for future listeners because it's cold
-    def1.done(3);
+    def1.send(2); // will be stored for future listeners because it's cold
+    def1 <= 3; // shorthand for def1.send(3)
     var step = 0;
     def1.promise.success.forEach(){
         if($0==2 && step==0) {step++}
@@ -52,14 +52,13 @@ func simpleColdDefferedTest() {
         else if($0==5 && step==2) {println("success simpleColdDefferedTest");}
         else {println("failed simpleColdDefferedTest")}
     }
-    def1.done(5);
+    def1.send(5);
 }; simpleColdDefferedTest();
 
 func filterMapHotTest() {
     var def1 = Deffered<Int,Int>(isCold: false); //isCold: true for history playback
     var p = def1.promise;
     
-    //var step = 0;
     var m = p.success
         .filter() { $0 < 100 }
         .map() { "My number is " + String($0) }
@@ -70,9 +69,27 @@ func filterMapHotTest() {
         else {println("failed filterMapHotDeffered unexpected")}
     }
     
-    def1.done(105);
-    def1.done(5);
+    def1.send(105);
+    def1.send(5);
 }; filterMapHotTest();
+
+// Neat shorthand syntax
+func shortHandTests() {
+    var def1 = Deffered<Int,Int>(isCold: false); //isCold: true for history playback
+    var p = def1.promise;
+    
+    var m = (p %= { $0 < 100 }) // filter
+            >>= { "My number is " + String($0) } // map
+    
+    m >= { // forEach
+        if($0=="My number is 105") {println("fail shortHandTests");}
+        else if($0=="My number is 5") {println("success shortHandTests");}
+        else {println("failed shortHandTests unexpected")}
+    }
+    
+    def1 <= 105; // def1.val = 105
+    def1 <= 5; // def1.val = 5
+}; shortHandTests();
 
 func mergeTest() {
     var def1 = Deffered<Int,Int>(isCold: false); //isCold: true for history playback
@@ -87,8 +104,8 @@ func mergeTest() {
             println("failed mergeTest");
         }
     }
-    def1.done(5);
-    def2.done("Hello");
+    def1.send(5);
+    def2.send("Hello");
 }; mergeTest();
 
 func foldTest() {
@@ -102,9 +119,9 @@ func foldTest() {
             else { println("failed foldTest unexpected") }
         }
     
-    def1.done(2);
-    def1.done(3);
-    def1.done(4);
+    def1.send(2);
+    def1.send(3);
+    def1.send(4);
 }; foldTest();
 
 func slidingTest() {
