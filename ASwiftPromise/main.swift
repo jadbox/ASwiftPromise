@@ -21,7 +21,7 @@ func simpleFuture() {
 
 func simpleHotDefferedTest() {
     var def1 = Deffered<Int,Int>(isCold: false);
-    def1.done(3); // thrown away since it's cold
+    def1.done(3); // thrown away since it's hot
     def1.promise.success.forEach(){
         if($0==3) {println("fail simpleHotDefferedTest");}
         else if($0==5) {println("success simpleHotDefferedTest");}
