@@ -7,7 +7,7 @@ Examples:
     var d = Deffered<Int,Int>(isCold:false);
     var p = d.promise;
     
-    d.done(2); // ignored since the Deffered is cold and no handles have been placed on the promise yet
+    d.done(2); // ignored since the Deffered is hot and no handles have been placed on the promise yet
     
     var mf = p.success
         .filter() { $0 < 100 }
