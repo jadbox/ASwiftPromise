@@ -11,7 +11,7 @@ import Foundation
 
 func simpleFuture() {
     var f = Future<Int>(isCold: false);
-    f.val = 3; // thrown away since it's cold
+    f.val = 3; // thrown away since it's hot
     f.forEach(){
         if($0==3) {println("fail simpleFuture");}
         else if($0==5) {println("success simpleFuture");}
