@@ -11,7 +11,7 @@ Examples:
     
     var mf = p.success
         .filter() { $0 < 100 }
-        .map() { "Hello World " + String($0) }
+        .map() { "Hello World " + String($0) } // change the stream from ints to strings
         .forEach() { (x) in println(x) }; // forEach does not change the stream output
 
     d.done(98);
