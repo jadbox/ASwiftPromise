@@ -4,6 +4,8 @@ This is a simple (working) Promise library for Apple's Swift language. Since it'
 
 Observables and Promises can be hot (default) and cold. Cold streams cache their history and replay it to new handlers.
 
+Supported operations: filter, map, forEach, fold, merge, slideBy, once
+
 Examples:
 
     // A Promise contains two Observables to monitor sent data and raised errors
