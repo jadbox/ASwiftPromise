@@ -193,6 +193,7 @@ class Future<T> { // : Future<T>
     
 }
 
+// Promises encapsolate two Futures for success and fail
 class Promise<T,F> {
     let success:Future<T>;
     let fail:Future<F>;
@@ -226,6 +227,7 @@ class Promise<T,F> {
     }
 }
 
+// Deffered fulfills its Promise, instructing a success or fail
 class Deffered<T,F> {
     let promise:Promise<T,F>;
     
