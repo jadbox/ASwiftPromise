@@ -56,4 +56,18 @@ Filter shorthand %=
 
 Send (input) data shorthand <=
 
+Shorthand example:
+
+    var def1 = Promise<Int,Int>();
+    
+    var m = (def1 %= { $0 < 100 }) // alias filter
+            >>= { "My number is " + String($0) } // alias map
+    
+    m >= { // alias forEach
+        println("\($0)"); // Prints "My number is 105"
+    }
+    
+    def1 <= 105; // def1.val = 105
+    def1 <= 5; // def1.val = 5
+
 [@jonathanAdunlap](http://twitter.com/jonathanAdunlap)
