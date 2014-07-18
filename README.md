@@ -44,7 +44,7 @@ Examples:
     }
     p2 <= "Hello"; // fulfill promise in d2
     p <= 1; // update promise p
-    p <= 100; // filtered because of the filter on mf
+    p <= 106; // filtered out of p2 because of the filter on mf used for merging
     
 **See [main.swift](https://github.com/jadbox/ASwiftPromise/blob/master/ASwiftPromise/main.swift) for several more detailed examples!**
 
