@@ -56,6 +56,8 @@ Filter shorthand %=
 
 Send (input) data shorthand <=
 
+Shorthand merge of Observable(s) +
+
 Shorthand example:
 
     var p = Promise<Int,Int>();
@@ -69,6 +71,17 @@ Shorthand example:
         println("\($0)"); // Prints "My number is 105"
     }
     
+    // 2nd Observable
+    var def2 = Observable<Int>();
+    var m2 = def2 >>= { $0 + 1 };
+    // Merged Observable of m and m2
+    var merged = m + m2;
+    merged >= {
+        // $0.0 and $0.1 are tuple accessors
+        println("Value of m is \($0.0) and m2 is \($0.1)"); 
+    }
+    
+    // Fulfill values
     def1 <= 105; // alias of def1.val = 105
     def1 <= 5; 
 
