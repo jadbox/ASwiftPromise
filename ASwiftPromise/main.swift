@@ -79,12 +79,16 @@ func shortHandTests() {
     var m = (def1 %= { $0 < 100 }) // filter
             >>= { "My number is " + String($0) } // map
     
-    m >= { // forEach
-        if($0=="My number is 105") {println("fail shortHandTests");}
-        else if($0=="My number is 5") {println("success shortHandTests");}
-        else {println("failed shortHandTests unexpected")}
-    }
+    var def2 = Observable<Int>();
+    var m2 = def2 >>= { $0 + 1 };
     
+    var merged = m + m2; // Merge two streams into tuple Observable<(M:type, M2:type)>
+    merged >= {
+        if($0.0 == "My number is 105") { println("fail shortHandTests (filtering)"); }
+        if($0.0 == "My number is 5" && $0.1 == 2) { println("success shortHandTests"); }
+        else {println("failed shortHandTests unexpected \($0)" )}
+    }
+    def2 <= 1; //def2.val = 1
     def1 <= 105; // def1.val = 105
     def1 <= 5; // def1.val = 5
 }; shortHandTests();

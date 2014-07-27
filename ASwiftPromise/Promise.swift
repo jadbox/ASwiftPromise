@@ -12,6 +12,7 @@ operator prefix <= {} // shortcut for assignments
 operator prefix >= {} // shortcut for forEach
 operator prefix >>= {} // shortcut for map
 operator prefix %= {} // shortcut for filter
+//operator prefix +{} // shortcut for merge, not needed to be defined
 
 extension Observable {
     /*
@@ -208,6 +209,9 @@ class Observable<T> { // : Future<T>
 }
 @infix func %=<T> (left: Observable<T>, right: (T)->(Bool)) -> Observable<T> {
     return left.filter(right);
+}
+@infix func +<T,K> (left: Observable<T>, right: Observable<K>) -> Observable<(T,K)> {
+    return left.merge(right);
 }
 
 // Promises encapsolate two Observables for success and fail
