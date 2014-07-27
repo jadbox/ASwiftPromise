@@ -82,6 +82,7 @@ Shorthand example:
     }
     
     // Fulfill values
+    def2 <= 11; // alias of def2.val = 11
     def1 <= 105; // alias of def1.val = 105
     def1 <= 5; 
 
