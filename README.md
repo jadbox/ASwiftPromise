@@ -75,7 +75,7 @@ Shorthand example:
     var def2 = Observable<Int>();
     var m2 = def2 >>= { $0 + 1 };
     // Merged Observable of m and m2
-    var merged = m + m2;
+    var merged = m + m2; // result is an Observable<(type of M, type of M2)>
     merged >= {
         // $0.0 and $0.1 are tuple accessors
         println("Value of m is \($0.0) and m2 is \($0.1)"); 
