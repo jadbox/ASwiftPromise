@@ -1,6 +1,8 @@
 <img src="http://www.minddriven.de/wp-content/uploads/2009/11/Rx_Logo_512.png" width="100px"/>
 
-This is a simple (working) Promise library for Apple's Swift language. Since it's becomming more like Rx (Reactive Extensions) than a Promise library, I'll be changing the naming conventions where appropriate. Currently, Observables do not handle any response other than it's generic type (versus Rx which does allow this). Conversely, a Promise contains two Observables for handling the primary data types as well as the error type. This library completely utilizes a strongly typed interface for handlers, stream transforms, sugar operators; everything is typed for compile-time checking!
+This is a simple (working) Promise library for Apple's Swift language. Since it's becomming more like Rx (Reactive Extensions) than a Promise library, I'll be changing the naming conventions where appropriate. Currently, Observables do not handle any response other than it's generic type (versus Rx which does allow this). Conversely, a Promise contains two Observables for handling the primary data types as well as the error type. This library completely utilizes a strongly typed interface for handlers, stream transforms, sugar operators; everything is typed for compile-time checking! 
+
+Another major different between this library and Rx is that Observables and Observers are collapsed into just Observables. The reason for having both objects in Rx is to seperate/isolate the reciever of data from the data sender; however since Swift does not provide protected members, isolation isn't technically possible (without resorting to odd conventions). As a side effect, the api becomes a tad simplier, although less strict/pure.
 
 Observables and Promises can be hot (default) and cold. Cold streams cache their history and replay it to new handlers.
 
